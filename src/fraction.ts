@@ -6,43 +6,38 @@ export class Fraction {
   }
 
   /**
-   * Mutliplies the current fraction by a scalar and returns the result.
+   * Returns the current fraction scaled by the given factor.
    */
-  multiply(quantity: number): Fraction {
-    return new Fraction(this.numerator * quantity, this.denominator * quantity);
-  }
-
-  /**
-   * Divides the current fraction by a scalar and returns the result.
-   */
-  divide(quantity: number): Fraction {
-    return new Fraction(this.numerator / quantity, this.denominator / quantity);
+  scale(factor: number): Fraction {
+    return new Fraction(this.numerator * factor, this.denominator * factor);
   }
 
   /**
    * Returns the current fraction as an irreductible fraction.
    */
   reduce(): Fraction {
-    return this.divide(gcd(this.numerator, this.denominator));
-  }
-
-  /**
-   * Sums the given fraction to the current one and returns the result.
-   */
-  add(other: Fraction): Fraction {
-    const current = this.multiply(other.denominator);
-    const otherone = other.multiply(this.denominator);
-    return new Fraction(current.numerator + otherone.numerator, current.denominator);
+    // Reducing a fraction is scaling it down, hence the division by the inverse.
+    return this.scale(1 / gcd(this.numerator, this.denominator));
   }
 
   /**
    * Sums the given fraction to the current one and returns the result as an irreductible fraction.
    */
-  addAndReduce(other: Fraction): Fraction {
-    return this.add(other).reduce();
+  add(other: Fraction): Fraction {
+    const current = this.scale(other.denominator);
+    const otherone = other.scale(this.denominator);
+    return new Fraction(current.numerator + otherone.numerator, current.denominator).reduce();
+  }
+
+  /**
+   * Mutliplies the current fraction by another fraction and returns the result. NOTE: set the
+   * denominator to 1 to multiply by an integer and set the nominator to 1 to divide by an integer.
+   */
+  multiply(other: Fraction): Fraction {
+    return new Fraction(this.numerator * other.numerator, this.denominator * other.denominator).reduce();
   }
 }
 
-export function addFractions(...fractions: Fraction[]): Fraction {
+export function addManyFractions(...fractions: Fraction[]): Fraction {
   return fractions.reduce((acc, curr) => (acc = acc.add(curr))).reduce();
 }
